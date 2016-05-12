@@ -5,12 +5,6 @@ project(sara_robot)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  rosserial
-  urg-node
-  xsens-driver
-  roboteq
-  robotiq
-  dynamixel_motor
 )
 
 ## System dependencies are found with CMake's conventions

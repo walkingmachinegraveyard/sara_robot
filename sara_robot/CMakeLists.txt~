@@ -8,9 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   rosserial
   urg-node
   xsens-driver
-  roboteq-driver
-  roboteq-diagnostics
-  roboteq-msgs
+  roboteq
+  robotiq
+  dynamixel_motor
 )
 
 ## System dependencies are found with CMake's conventions
