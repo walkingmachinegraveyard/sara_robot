@@ -1,3 +1,6 @@
 [submodule "roboteq"]
 	path = roboteq
 	url = https://github.com/WalkingMachine/roboteq
+[submodule "kinova-ros"]
+	path = kinova-ros
+	url = https://github.com/Kinovarobotics/kinova-ros
