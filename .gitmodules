@@ -1,0 +1,3 @@
+[submodule "roboteq"]
+	path = roboteq
+	url = https://github.com/WalkingMachine/roboteq
