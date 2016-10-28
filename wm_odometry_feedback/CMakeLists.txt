@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sara_bringup)
+project(wm_odometry_feedback)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
+  message_filters
+  nav_msgs
+  roboteq_msgs
+  rospy
+  tf2_ros
+  tf_conversions
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -63,7 +71,7 @@ find_package(catkin REQUIRED)
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
+#   geometry_msgs#   nav_msgs#   roboteq_msgs
 # )
 
 ################################################
@@ -97,8 +105,8 @@ find_package(catkin REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES sara_bringup
-#  CATKIN_DEPENDS other_catkin_pkg
+#  LIBRARIES wm_odometry_feedback
+  CATKIN_DEPENDS geometry_msgs message_filters nav_msgs roboteq_msgs rospy tf2_ros tf_conversions
 #  DEPENDS system_lib
 )
 
@@ -109,26 +117,29 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a C++ library
-# add_library(sara_bringup
-#   src/${PROJECT_NAME}/sara_bringup.cpp
+# add_library(wm_odometry_feedback
+#   src/${PROJECT_NAME}/wm_odometry_feedback.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(sara_bringup ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(wm_odometry_feedback ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(sara_bringup_node src/sara_bringup_node.cpp)
+# add_executable(wm_odometry_feedback_node src/wm_odometry_feedback_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(sara_bringup_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(wm_odometry_feedback_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(sara_bringup_node
+# target_link_libraries(wm_odometry_feedback_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -147,7 +158,7 @@ catkin_package(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS sara_bringup sara_bringup_node
+# install(TARGETS wm_odometry_feedback wm_odometry_feedback_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -172,7 +183,7 @@ catkin_package(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_sara_bringup.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_wm_odometry_feedback.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
