@@ -1,6 +1,8 @@
 [submodule "roboteq"]
 	path = roboteq
 	url = https://github.com/WalkingMachine/roboteq
+        branch = 4daec79a729912558641ba3888e3a7bc2fc2de3a
 [submodule "kinova-ros"]
 	path = kinova-ros
 	url = https://github.com/Kinovarobotics/kinova-ros
+        branch = 24b856ad273b071bbd909ea0e7e2c2ee397b0e1d

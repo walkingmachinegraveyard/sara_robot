@@ -1,1 +1,1 @@
-- git: {local-name: sara_commun, uri: 'https://github.com/WalkingMachine/sara_commun.git', version: feature_submodule}
+- git: {local-name: sara_commun, uri: 'https://github.com/WalkingMachine/sara_commun.git', version: develop}
