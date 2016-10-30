@@ -4,8 +4,8 @@ neckHead_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: neckHead_dynamixel_joint
-    joint_speed: 1.0
-    port_name: "/dev/usb-ports/7-1.4"
+    joint_speed: 0.5
+    port_name: "/dev/usb-ports/1-1.4"
     motor:
         id: 1
         init: 3161
