@@ -3,8 +3,8 @@ neckHead_controller:
         package: dynamixel_controllers
         module: joint_position_controller
         type: JointPositionController
-    joint_name: neckHead_dynamixel_joint
-    joint_speed: 1.0
+    joint_name: head_dynamixel_joint
+    joint_speed: 2
     port_name: "/dev/usb-ports/7-1.4"
     motor:
         id: 1
