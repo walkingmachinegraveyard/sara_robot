@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   roscpp
+  rospy
   wm_arm_msgs
 )
 
@@ -108,7 +109,7 @@ generate_messages(DEPENDENCIES std_msgs sensor_msgs wm_arm_msgs)
 catkin_package(
   INCLUDE_DIRS src/Lib
 #  LIBRARIES wm_arm_driver
-  CATKIN_DEPENDS actionlib actionlib_msgs roscpp wm_arm_msgs
+  CATKIN_DEPENDS actionlib actionlib_msgs roscpp rospy wm_arm_msgs
   DEPENDS Eigen
 )
 

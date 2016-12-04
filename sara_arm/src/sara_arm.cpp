@@ -31,6 +31,14 @@ using namespace std;
 
 void teleop( const std_msgs::Int8MultiArray& msg )
 {
+	SetJointGlobPoint( 1, msg.data[0] );
+ 	SetJointGlobPoint( 2, msg.data[1] );
+ 	SetJointGlobPoint( 3, msg.data[2] );
+ 	SetJointGlobPoint( 4, msg.data[3] );
+ 	SetJointGlobPoint( 5, msg.data[4] );
+ 	SetJointGlobPoint( 6, msg.data[5] );
+	ApplyVelocities();
+	/*
 	int Vel[6];
 	Vel[0] = msg.data[0];
 	Vel[1] = msg.data[1];
@@ -40,17 +48,17 @@ void teleop( const std_msgs::Int8MultiArray& msg )
 	Vel[5] = msg.data[5];
 
 
-	int i;
-	for( i=0; i<200; i++ ){
+	//int i;
+	//for( i=0; i<200; i++ ){
 
-		cout << "Go!" << i << endl;
+		//cout << "Go!" << i << endl;
 
-		cout << "Joint1 :" << Vel[0] << endl;
-		cout << "Joint2 :" << Vel[1] << endl;
-		cout << "Joint3 :" << Vel[2] << endl;
-		cout << "Joint4 :" << Vel[3] << endl;
-		cout << "Joint5 :" << Vel[4] << endl;
-		cout << "Joint6 :" << Vel[5] << endl;
+		//cout << "Joint1 :" << Vel[0] << endl;
+		//cout << "Joint2 :" << Vel[1] << endl;
+		//cout << "Joint3 :" << Vel[2] << endl;
+		//cout << "Joint4 :" << Vel[3] << endl;
+		//cout << "Joint5 :" << Vel[4] << endl;
+		//cout << "Joint6 :" << Vel[5] << endl;
 
 	 	SetJointGlobPoint( 1, Vel[0] );
 	 	SetJointGlobPoint( 2, Vel[1] );
@@ -60,8 +68,8 @@ void teleop( const std_msgs::Int8MultiArray& msg )
 	 	SetJointGlobPoint( 6, Vel[5] );
 		ApplyVelocities();
 		//usleep(1000);
-	}
-	cout << "Fini!" << endl;
+	//}
+	cout << "Fini!" << endl;*/
 }
 
 
