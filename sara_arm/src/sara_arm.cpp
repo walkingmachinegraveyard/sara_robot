@@ -2,7 +2,7 @@
 #include "Lib/sara_arm.h"
 
 
-KinovaDevice list[MAX_KINOVA_DEVICE];
+KinovaDevice devices[MAX_KINOVA_DEVICE];
 int devicesCount;
 
 
@@ -23,139 +23,128 @@ int MyStartPosition[] = { 	180,
 
 using namespace std;
 
-int main()
+
+
+
+
+
+
+void teleop( const std_msgs::Int8MultiArray& msg )
 {
 
-	string Animation = "RobotDance";
+	cout << "Joint1 :" << msg.data[0] << endl;
+	cout << "Joint2 :" << msg.data[1] << endl;
+	cout << "Joint3 :" << msg.data[2] << endl;
+	cout << "Joint4 :" << msg.data[3] << endl;
+	cout << "Joint5 :" << msg.data[4] << endl;
+	cout << "Joint6 :" << msg.data[5] << endl;
 
+ 	SetJointGlobPoint( 1, msg.data[0] );
+ 	SetJointGlobPoint( 2, msg.data[1] );
+ 	SetJointGlobPoint( 3, msg.data[2] );
+ 	SetJointGlobPoint( 4, msg.data[3] );
+ 	SetJointGlobPoint( 5, msg.data[4] );
+ 	SetJointGlobPoint( 6, msg.data[5] );
 
-	//We load the library
-	commandLayer_handle = dlopen("Kinova.API.USBCommandLayerUbuntu.so",RTLD_NOW|RTLD_GLOBAL);
+	ApplyVelocities();
 
-	//We load the functions from the library
-	MyInitAPI = (int (*)()) dlsym(commandLayer_handle,"InitAPI");
-	MyCloseAPI = (int (*)()) dlsym(commandLayer_handle,"CloseAPI");
-	MyMoveHome = (int (*)()) dlsym(commandLayer_handle,"MoveHome");
-	MyEraseAllTrajectories = (int (*)()) dlsym(commandLayer_handle,"EraseAllTrajectories");
-	MySetJointZero = (int (*)(int ActuatorAdress)) dlsym(commandLayer_handle,"SetJointZero");
-	MyInitFingers = (int (*)()) dlsym(commandLayer_handle,"InitFingers");
-	MyGetDevices = (int (*)(KinovaDevice devices[MAX_KINOVA_DEVICE], int &result)) dlsym(commandLayer_handle,"GetDevices");
-	MySetActiveDevice = (int (*)(KinovaDevice devices)) dlsym(commandLayer_handle,"SetActiveDevice");
-	MySendBasicTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendBasicTrajectory");
-	MySendAdvanceTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendAdvanceTrajectory");
-	MyGetAngularCommand = (int (*)(AngularPosition &)) dlsym(commandLayer_handle,"GetAngularCommand");
-
-
-
-	pointToSend.InitStruct();
+}
 
 
 
 
-	if((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MySendBasicTrajectory == NULL) ||
-	   (MySendAdvanceTrajectory == NULL) || (MyMoveHome == NULL) || (MyInitFingers == NULL))
-	{
-		cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
-	}
-	else
-	{
-		cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
-
-		result = (*MyInitAPI)();
-		devicesCount = MyGetDevices(list, result);
-
-		cout << "Initialization's result :" << result << endl;
-
-
-
-		for(int i = 0; i < devicesCount; i++)
-		{
-
-
-
-			cout << "Found a robot on the USB bus (" << list[i].SerialNumber << ")" << endl;
-
-			//Setting the current device as the active device.
-			MySetActiveDevice(list[i]);
-
-			cout << "Go to start position" << endl;
-			MyGoToStart( );
-			WaitForReach( );
-
-
-
-			cout << "*********************************" << endl;
-			cout << "Finding animation"<< Animation << ")" << endl;
-
-
-			if ( Animation == "RobotDance" ) {
-
-				SetJointGlobPoint( 1, 260 );
-				SetJointGlobPoint( 2, 90 );
-				SetJointGlobPoint( 3, 102 );
-				SetJointGlobPoint( 4, 270 );
-				SetJointGlobPoint( 5, 300 );
-				ApplyPoint( 20 );
-				WaitForReach( );
-
-				Stop(  );
-				float Speed;
-				float Period;
-
-				Period = 5000;
-
-				for( float i=0; i<(5.0/Period*1000); i++ ){
-
-					Speed = sin(i/Period*100.0f)*40.0f;
-
-					cout << "Speed = " << Speed << endl;
-
-					SetJointGlobPoint( 4, Speed );
-					ApplyVelocities( );
-					usleep(Period);
-				}
-			} else if ( Animation == "HeilSara!" ) {
-
-				SetJointGlobPoint( 1, 180 );
-				SetJointGlobPoint( 2, 130 );
-				SetJointGlobPoint( 3, 30 );
-				SetJointGlobPoint( 4, 270 );
-				SetJointGlobPoint( 5, 300 );
-				ApplyPoint( 20 );
-				WaitForReach( );
-
-
-				SetJointRelPoint( 3, 40 );
-				SetJointRelPoint( 5, 40 );
-				ApplyPoint( 60 );
-				WaitForReach( );
-
-
-				SetJointRelPoint( 3, -40 );
-				SetJointRelPoint( 5, -40 );
-				ApplyPoint( 60 );
-				WaitForReach( );
-
-
-				MyGoToStart( );
-				WaitForReach(  );
-
-				//sleep(1);
-
-			}
 
 
 
 
-		}
-		cout << endl << "C L O S I N G   A P I" << endl;
-		result = (*MyCloseAPI)();
+
+int main(int argc, char **argv)
+{
+
+  	string Animation = "CrazySara";
+
+
+  	//We load the library
+  	commandLayer_handle = dlopen("Kinova.API.USBCommandLayerUbuntu.so",RTLD_NOW|RTLD_GLOBAL);
+
+  	//We load the functions from the library
+  	MyInitAPI = (int (*)()) dlsym(commandLayer_handle,"InitAPI");
+  	MyCloseAPI = (int (*)()) dlsym(commandLayer_handle,"CloseAPI");
+  	MyMoveHome = (int (*)()) dlsym(commandLayer_handle,"MoveHome");
+  	MyEraseAllTrajectories = (int (*)()) dlsym(commandLayer_handle,"EraseAllTrajectories");
+  	MySetJointZero = (int (*)(int ActuatorAdress)) dlsym(commandLayer_handle,"SetJointZero");
+  	MyInitFingers = (int (*)()) dlsym(commandLayer_handle,"InitFingers");
+  	MyGetDevices = (int (*)(KinovaDevice devices[MAX_KINOVA_DEVICE], int &result)) dlsym(commandLayer_handle,"GetDevices");
+  	MySetActiveDevice = (int (*)(KinovaDevice devices)) dlsym(commandLayer_handle,"SetActiveDevice");
+  	MySendBasicTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendBasicTrajectory");
+  	MySendAdvanceTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendAdvanceTrajectory");
+  	MyGetAngularCommand = (int (*)(AngularPosition &)) dlsym(commandLayer_handle,"GetAngularCommand");
+
+  	MyGetSensorsInfo = (int (*)(SensorsInfo &)) dlsym(commandLayer_handle,"GetSensorsInfo");
+
+
+
+
+  	pointToSend.InitStruct();
+
+
+
+
+  	if((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MySendBasicTrajectory == NULL) ||
+  	   (MySendAdvanceTrajectory == NULL) || (MyMoveHome == NULL) || (MyInitFingers == NULL))
+  	{
+  		cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
+  	}
+  	else
+  	{
+  		cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
+
+  		result = (*MyInitAPI)();
+  		devicesCount = MyGetDevices(devices, result);
+
+  		cout << "Initialization's result :" << result << endl;
+
+
+
+		ros::init(argc, argv, "sara_arm");
+
+		ros::NodeHandle n;
+
+
+
+
+		ros::Subscriber sub = n.subscribe("teleop_arm", 10, teleop );
+
+		ros::spin();
+
+
+	//	cout << endl << "C L O S I N G   A P I" << endl;
+	//	result = (*MyCloseAPI)();
 	}
 
-	dlclose(commandLayer_handle);
+
+
+
+
+
+	// dlclose(commandLayer_handle);
 
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -241,23 +230,17 @@ void Stop(  ){
 void SetJointRelPoint( int Joint, int Angle ){
 	MyGetAngularCommand(currentCommand);
 	switch (Joint) {
-		case 1:
-			pointToSend.Position.Actuators.Actuator1 = currentCommand.Actuators.Actuator1+Angle;
+		case 1: pointToSend.Position.Actuators.Actuator1 = currentCommand.Actuators.Actuator1+Angle;
 		break;
-		case 2:
-			pointToSend.Position.Actuators.Actuator2 = currentCommand.Actuators.Actuator2+Angle;
+		case 2: pointToSend.Position.Actuators.Actuator2 = currentCommand.Actuators.Actuator2+Angle;
 		break;
-		case 3:
-			pointToSend.Position.Actuators.Actuator3 = currentCommand.Actuators.Actuator3+Angle;
+		case 3: pointToSend.Position.Actuators.Actuator3 = currentCommand.Actuators.Actuator3+Angle;
 		break;
-		case 4:
-			pointToSend.Position.Actuators.Actuator4 = currentCommand.Actuators.Actuator4+Angle;
+		case 4: pointToSend.Position.Actuators.Actuator4 = currentCommand.Actuators.Actuator4+Angle;
 		break;
-		case 5:
-			pointToSend.Position.Actuators.Actuator5 = currentCommand.Actuators.Actuator5+Angle;
+		case 5: pointToSend.Position.Actuators.Actuator5 = currentCommand.Actuators.Actuator5+Angle;
 		break;
-		case 6:
-			pointToSend.Position.Actuators.Actuator6 = currentCommand.Actuators.Actuator6+Angle;
+		case 6: pointToSend.Position.Actuators.Actuator6 = currentCommand.Actuators.Actuator6+Angle;
 		break;
 	}
 }
@@ -268,23 +251,17 @@ void SetJointRelPoint( int Joint, int Angle ){
 void SetJointGlobPoint( int Joint, int Angle ){
 	MyGetAngularCommand(currentCommand);
 	switch (Joint) {
-		case 1:
-			pointToSend.Position.Actuators.Actuator1 = Angle;
+		case 1: pointToSend.Position.Actuators.Actuator1 = Angle;
 		break;
-		case 2:
-			pointToSend.Position.Actuators.Actuator2 = Angle;
+		case 2: pointToSend.Position.Actuators.Actuator2 = Angle;
 		break;
-		case 3:
-			pointToSend.Position.Actuators.Actuator3 = Angle;
+		case 3: pointToSend.Position.Actuators.Actuator3 = Angle;
 		break;
-		case 4:
-			pointToSend.Position.Actuators.Actuator4 = Angle;
+		case 4: pointToSend.Position.Actuators.Actuator4 = Angle;
 		break;
-		case 5:
-			pointToSend.Position.Actuators.Actuator5 = Angle;
+		case 5: pointToSend.Position.Actuators.Actuator5 = Angle;
 		break;
-		case 6:
-			pointToSend.Position.Actuators.Actuator6 = Angle;
+		case 6: pointToSend.Position.Actuators.Actuator6 = Angle;
 		break;
 	}
 }
@@ -305,5 +282,15 @@ void MyGoToStart( ){
 	SetJointGlobPoint( 6, MyStartPosition[5] );
 
 	ApplyPoint( 30 );
+
+}
+
+
+
+void PrintInfo(){
+
+	MyGetSensorsInfo( Response );
+	cout << "Courant = " << Response.Current << endl;
+	cout << "Tension = " << Response.Voltage << endl;
 
 }

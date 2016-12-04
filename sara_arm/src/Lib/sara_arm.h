@@ -11,15 +11,18 @@
 	#include <stdlib.h>
 	#include <cmath>
 	#include <string>
-
-
-
+	#include "ros/ros.h"
+	#include "std_msgs/String.h"
+	#include "std_msgs/Int8MultiArray.h"
 
 
 	int result;
 
 	AngularPosition currentCommand;
 	TrajectoryPoint pointToSend;
+
+	SensorsInfo Response;
+
 
 	//Handle for the library's command layer.
 	void * commandLayer_handle;
@@ -36,12 +39,11 @@
 	int (*MyInitFingers)();
 	int (*MyGetAngularCommand)(AngularPosition &);
 	int (*MyEraseAllTrajectories)();
-
-
+	int (*MyGetSensorsInfo)(SensorsInfo &);
 
 	void Stop(  );
 
-	int main();
+	int main(int argc, char **argv);
 
 	void MyGoToStart( );
 
@@ -57,6 +59,11 @@
 	void MyGoToStart( );
 
 	void ApplyVelocities( );
+
+	void teleop(const std_msgs::Int8MultiArray& msg);
+
+	void animation(const std_msgs::String::ConstPtr& msg);
+
 
 
 #endif
