@@ -58,30 +58,28 @@
 	int (*MyEraseAllTrajectories)();
 	int (*MyGetSensorsInfo)(SensorsInfo &);
 
-	void Stop(  );
 
-	int main(int argc, char **argv);
+	void Stop(  );  // Commande pour arrêter les mouvements du bras et éffacer son FIFO
 
-	void MyGoToStart( );
+	int main(int argc, char **argv);  // Routine principale
 
-	void WaitForReach(  );
+	void MyGoToStart( );  // Positionne le bras à sa position de départ
 
-	void ApplyPoint( int Speed );
+	void WaitForReach(  );  // Attendre que le bras ateinge le prochain point du FIFO
 
-	void SetJointRelPoint( int Joint, int Angle);
+	void ApplyPoint( int Speed );  // Ajoute un point de position au FIFO du bras
 
-	void SetJointGlobPoint( int Joint, int Angle );
+	void SetJointRelPoint( int Joint, int Angle);  // Prépare la valeur de point d'un joint de facon relative à la position actuelle.
 
-	// Function to go to the hardcoded starting position
-	void MyGoToStart( );
+	void SetJointGlobPoint( int Joint, int Angle );  // Prépare la valeur de point d'un joint de facon globale.
 
-	void ApplyVelocities( );
+	void ApplyVelocities( );  // Ajoute un point de vélocité au FIFO du bras
 
-	void teleop(const std_msgs::Int8MultiArray& msg);
+	void teleop(const std_msgs::Int8MultiArray& msg);  // Node qui lis un topic pour controler le bras en mode vélocité
 
-	void animation( const std_msgs::String msg );
+	void animation( const std_msgs::String msg );  // Node que controle les actions d'animation
 
-	void Execute_sequence( Sequence Anim );
+	void Execute_sequence( Sequence Anim );  // Routine qui exécute une séquence pré enseigné
 
 
 #endif
