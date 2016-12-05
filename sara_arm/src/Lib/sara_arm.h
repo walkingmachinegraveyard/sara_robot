@@ -18,6 +18,23 @@
 
 	int result;
 
+
+	bool Can_teleop;
+
+	struct Point {
+		int Speed;
+		int Joints[6];
+	};
+
+	struct Sequence {
+		Point Points[];
+		int Lenght;
+	};
+
+
+
+	Sequence Anim;
+
 	AngularPosition currentCommand;
 	TrajectoryPoint pointToSend;
 
@@ -62,8 +79,9 @@
 
 	void teleop(const std_msgs::Int8MultiArray& msg);
 
-	void animation(const std_msgs::String::ConstPtr& msg);
+	void animation( const std_msgs::String msg );
 
+	void Execute_sequence( Sequence Anim );
 
 
 #endif

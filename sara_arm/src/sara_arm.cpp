@@ -18,59 +18,53 @@ int MyStartPosition[] = { 	180,
 
 
 
-
-
-
 using namespace std;
-
-
-
 
 
 
 
 void teleop( const std_msgs::Int8MultiArray& msg )
 {
-	SetJointGlobPoint( 1, msg.data[0] );
- 	SetJointGlobPoint( 2, msg.data[1] );
- 	SetJointGlobPoint( 3, msg.data[2] );
- 	SetJointGlobPoint( 4, msg.data[3] );
- 	SetJointGlobPoint( 5, msg.data[4] );
- 	SetJointGlobPoint( 6, msg.data[5] );
-	ApplyVelocities();
-	/*
-	int Vel[6];
-	Vel[0] = msg.data[0];
-	Vel[1] = msg.data[1];
-	Vel[2] = msg.data[2];
-	Vel[3] = msg.data[3];
-	Vel[4] = msg.data[4];
-	Vel[5] = msg.data[5];
-
-
-	//int i;
-	//for( i=0; i<200; i++ ){
-
-		//cout << "Go!" << i << endl;
-
-		//cout << "Joint1 :" << Vel[0] << endl;
-		//cout << "Joint2 :" << Vel[1] << endl;
-		//cout << "Joint3 :" << Vel[2] << endl;
-		//cout << "Joint4 :" << Vel[3] << endl;
-		//cout << "Joint5 :" << Vel[4] << endl;
-		//cout << "Joint6 :" << Vel[5] << endl;
-
-	 	SetJointGlobPoint( 1, Vel[0] );
-	 	SetJointGlobPoint( 2, Vel[1] );
-	 	SetJointGlobPoint( 3, Vel[2] );
-	 	SetJointGlobPoint( 4, Vel[3] );
-	 	SetJointGlobPoint( 5, Vel[4] );
-	 	SetJointGlobPoint( 6, Vel[5] );
+	if ( Can_teleop ){
+		SetJointGlobPoint( 1, msg.data[0] );
+	 	SetJointGlobPoint( 2, msg.data[1] );
+	 	SetJointGlobPoint( 3, msg.data[2] );
+	 	SetJointGlobPoint( 4, msg.data[3] );
+	 	SetJointGlobPoint( 5, msg.data[4] );
+	 	SetJointGlobPoint( 6, msg.data[5] );
 		ApplyVelocities();
-		//usleep(1000);
-	//}
-	cout << "Fini!" << endl;*/
+	}
 }
+
+
+void animation( const std_msgs::String msg )
+{
+	if ( msg.data == "clear_sequence" ){
+		Anim.Lenght = 0;
+		Stop();
+
+	} else if ( msg.data == "jouer_sequence" ){
+		Execute_sequence( Anim );
+
+	} else if ( msg.data == "ajoute_point" ){
+
+		MyGetAngularCommand(currentCommand);
+		Anim.Points[Anim.Lenght].Joints[0] = currentCommand.Actuators.Actuator1;
+		Anim.Points[Anim.Lenght].Joints[1] = currentCommand.Actuators.Actuator2;
+		Anim.Points[Anim.Lenght].Joints[2] = currentCommand.Actuators.Actuator3;
+		Anim.Points[Anim.Lenght].Joints[3] = currentCommand.Actuators.Actuator4;
+		Anim.Points[Anim.Lenght].Joints[4] = currentCommand.Actuators.Actuator5;
+		Anim.Points[Anim.Lenght].Joints[5] = currentCommand.Actuators.Actuator6;
+		Anim.Points[Anim.Lenght].Speed = 100;
+
+	}
+}
+
+
+
+
+
+
 
 
 
@@ -83,7 +77,12 @@ void teleop( const std_msgs::Int8MultiArray& msg )
 int main(int argc, char **argv)
 {
 
-  	string Animation = "CrazySara";
+  	//string Animation = "CrazySara";
+
+
+
+	Anim.Lenght = 0;
+
 
 
   	//We load the library
@@ -315,4 +314,26 @@ void PrintInfo(){
 	cout << "Courant = " << Response.Current << endl;
 	cout << "Tension = " << Response.Voltage << endl;
 
+}
+
+
+
+void Execute_sequence( Sequence Anim )
+{
+	Can_teleop = false;
+	int i;
+	for ( i = 0; i<Anim.Lenght; i++ ){
+
+		SetJointGlobPoint( 1, Anim.Points[i].Joints[0] );
+		SetJointGlobPoint( 2, Anim.Points[i].Joints[1] );
+		SetJointGlobPoint( 3, Anim.Points[i].Joints[2] );
+		SetJointGlobPoint( 4, Anim.Points[i].Joints[3] );
+		SetJointGlobPoint( 5, Anim.Points[i].Joints[4] );
+		SetJointGlobPoint( 6, Anim.Points[i].Joints[5] );
+		ApplyPoint( Anim.Points[i].Speed );
+		WaitForReach( );
+
+	}
+
+	Can_teleop = true;
 }
