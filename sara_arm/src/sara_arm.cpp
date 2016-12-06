@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 	cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
 
 
-	bool Succes = false;
+	Succes = false;
 
 	while( !Succes ) {
 
@@ -169,11 +169,13 @@ int main(int argc, char **argv)
 	// Obtention du nodehandle
 	ros::NodeHandle n;
 
+	ros::Subscriber sub;
+
 	// inscription du node "teleop" au topic "teleop_arm"
-	ros::Subscriber sub = n.subscribe("teleop_arm", 10, teleop );
+	sub = n.subscribe("teleop_arm", 10, teleop );
 
 	// inscription du node "animation" au topic "animation_arm"
-	ros::Subscriber sub = n.subscribe("animation_arm", 10, animation );
+	sub = n.subscribe("animation_arm", 10, animation );
 
 	ros::spin();
 
