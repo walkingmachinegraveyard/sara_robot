@@ -1,5 +1,23 @@
+/*
+ SARA arm
+ input: std_msgs::Int8MultiArray&
+ input: std_msgs::String&
+ output: mouvements du bras
+
+*/
+
 
 #include "Lib/sara_arm.h"
+
+// Déclaration des variables utiles
+int result;  // Tampon de réception des résultats de certaines fonctions
+bool Can_teleop;  // Flag qui détermine si le node teleop est actif ou non
+Sequence Anim;
+AngularPosition AngularCommand;
+TrajectoryPoint pointToSend;
+SensorsInfo Response;
+
+
 
 
 KinovaDevice devices[MAX_KINOVA_DEVICE];
@@ -34,10 +52,11 @@ void teleop( const std_msgs::Int8MultiArray& msg )
 	 	SetJointGlobPoint( 6, msg.data[5] );
 		ApplyVelocities();
 	}
+
 }
 
 
-void animation( const std_msgs::String msg )
+void animation( const std_msgs::String& msg )
 {
 	if ( msg.data == "clear_sequence" ){
 		Anim.Lenght = 0;
@@ -47,14 +66,13 @@ void animation( const std_msgs::String msg )
 		Execute_sequence( Anim );
 
 	} else if ( msg.data == "ajoute_point" ){
-
-		MyGetAngularCommand(currentCommand);
-		Anim.Points[Anim.Lenght].Joints[0] = currentCommand.Actuators.Actuator1;
-		Anim.Points[Anim.Lenght].Joints[1] = currentCommand.Actuators.Actuator2;
-		Anim.Points[Anim.Lenght].Joints[2] = currentCommand.Actuators.Actuator3;
-		Anim.Points[Anim.Lenght].Joints[3] = currentCommand.Actuators.Actuator4;
-		Anim.Points[Anim.Lenght].Joints[4] = currentCommand.Actuators.Actuator5;
-		Anim.Points[Anim.Lenght].Joints[5] = currentCommand.Actuators.Actuator6;
+		MyGetAngularCommand( AngularCommand );
+		Anim.Points[Anim.Lenght].Joints[0] = AngularCommand.Actuators.Actuator1;
+		Anim.Points[Anim.Lenght].Joints[1] = AngularCommand.Actuators.Actuator2;
+		Anim.Points[Anim.Lenght].Joints[2] = AngularCommand.Actuators.Actuator3;
+		Anim.Points[Anim.Lenght].Joints[3] = AngularCommand.Actuators.Actuator4;
+		Anim.Points[Anim.Lenght].Joints[4] = AngularCommand.Actuators.Actuator5;
+		Anim.Points[Anim.Lenght].Joints[5] = AngularCommand.Actuators.Actuator6;
 		Anim.Points[Anim.Lenght].Speed = 100;
 
 	}
@@ -83,72 +101,89 @@ int main(int argc, char **argv)
 
 	Anim.Lenght = 0;
 
-
-
-  	//We load the library
-  	commandLayer_handle = dlopen("Kinova.API.USBCommandLayerUbuntu.so",RTLD_NOW|RTLD_GLOBAL);
-
-  	//We load the functions from the library
-  	MyInitAPI = (int (*)()) dlsym(commandLayer_handle,"InitAPI");
-  	MyCloseAPI = (int (*)()) dlsym(commandLayer_handle,"CloseAPI");
-  	MyMoveHome = (int (*)()) dlsym(commandLayer_handle,"MoveHome");
-  	MyEraseAllTrajectories = (int (*)()) dlsym(commandLayer_handle,"EraseAllTrajectories");
-  	MySetJointZero = (int (*)(int ActuatorAdress)) dlsym(commandLayer_handle,"SetJointZero");
-  	MyInitFingers = (int (*)()) dlsym(commandLayer_handle,"InitFingers");
-  	MyGetDevices = (int (*)(KinovaDevice devices[MAX_KINOVA_DEVICE], int &result)) dlsym(commandLayer_handle,"GetDevices");
-  	MySetActiveDevice = (int (*)(KinovaDevice devices)) dlsym(commandLayer_handle,"SetActiveDevice");
-  	MySendBasicTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendBasicTrajectory");
-  	MySendAdvanceTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendAdvanceTrajectory");
-  	MyGetAngularCommand = (int (*)(AngularPosition &)) dlsym(commandLayer_handle,"GetAngularCommand");
-
-  	MyGetSensorsInfo = (int (*)(SensorsInfo &)) dlsym(commandLayer_handle,"GetSensorsInfo");
-
-
-
-
   	pointToSend.InitStruct();
 
+	bool Succes = false;
 
+	while( !Succes ) {
 
+	  	//We load the library
+	  	commandLayer_handle = dlopen("Kinova.API.USBCommandLayerUbuntu.so",RTLD_NOW|RTLD_GLOBAL);
 
-  	if((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MySendBasicTrajectory == NULL) ||
-  	   (MySendAdvanceTrajectory == NULL) || (MyMoveHome == NULL) || (MyInitFingers == NULL))
-  	{
-  		cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
-  	}
-  	else
-  	{
-  		cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
+	  	//We load the functions from the library
+	  	MyInitAPI = (int (*)()) dlsym(commandLayer_handle,"InitAPI");
+	  	MyCloseAPI = (int (*)()) dlsym(commandLayer_handle,"CloseAPI");
+	  	MyMoveHome = (int (*)()) dlsym(commandLayer_handle,"MoveHome");
+	  	MyEraseAllTrajectories = (int (*)()) dlsym(commandLayer_handle,"EraseAllTrajectories");
+	  	MySetJointZero = (int (*)(int ActuatorAdress)) dlsym(commandLayer_handle,"SetJointZero");
+	  	MyInitFingers = (int (*)()) dlsym(commandLayer_handle,"InitFingers");
+	  	MyGetDevices = (int (*)(KinovaDevice devices[MAX_KINOVA_DEVICE], int &result)) dlsym(commandLayer_handle,"GetDevices");
+	  	MySetActiveDevice = (int (*)(KinovaDevice devices)) dlsym(commandLayer_handle,"SetActiveDevice");
+	  	MySendBasicTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendBasicTrajectory");
+	  	MySendAdvanceTrajectory = (int (*)(TrajectoryPoint)) dlsym(commandLayer_handle,"SendAdvanceTrajectory");
+	  	MyGetAngularCommand = (int (*)(AngularPosition &)) dlsym(commandLayer_handle,"GetAngularCommand");
+		MySetActuatorMaxVelocity = (int (*)(float &)) dlsym(commandLayer_handle,"SetActuatorMaxVelocity");
+	  	MyGetSensorsInfo = (int (*)(SensorsInfo &)) dlsym(commandLayer_handle,"GetSensorsInfo");
 
-  		result = (*MyInitAPI)();
-  		devicesCount = MyGetDevices(devices, result);
+		if ((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MySendBasicTrajectory == NULL) ||
+   		(MySendAdvanceTrajectory == NULL) || (MyMoveHome == NULL) || (MyInitFingers == NULL) ){
+	  		cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
+			sleep(1);
 
-  		cout << "Initialization's result :" << result << endl;
+	  	} else {
+			Succes = true;
 
-
-
-		ros::init(argc, argv, "sara_arm");
-
-		ros::NodeHandle n;
-
-
-
-
-		ros::Subscriber sub = n.subscribe("teleop_arm", 10, teleop );
-
-		ros::spin();
-
-
-	//	cout << endl << "C L O S I N G   A P I" << endl;
-	//	result = (*MyCloseAPI)();
+		}
 	}
 
 
+
+	cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
+
+
+	bool Succes = false;
+
+	while( !Succes ) {
+
+		result = (*MyInitAPI)();
+
+		if ( result > 10 ){
+	  		cout << "* * *                  N O   A R M   F O U N D               * * *" << endl;
+	  		cout << "* * *            S E A R C H I N G   A G A I N . . .         * * *" << endl;
+			sleep(1);
+
+	  	} else {
+			Succes = true;
+
+		}
+	}
+
+	devicesCount = MyGetDevices(devices, result);
+	cout << "Initialization's result :" << result << endl;
+
+
+	// ROS
+	// Initialisation
+	ros::init(argc, argv, "sara_arm");
+
+	// Obtention du nodehandle
+	ros::NodeHandle n;
+
+	// inscription du node "teleop" au topic "teleop_arm"
+	ros::Subscriber sub = n.subscribe("teleop_arm", 10, teleop );
+
+	// inscription du node "animation" au topic "animation_arm"
+	ros::Subscriber sub = n.subscribe("animation_arm", 10, animation );
+
+	ros::spin();
 
 
 
 
 	// dlclose(commandLayer_handle);
+
+	//	cout << endl << "C L O S I N G   A P I" << endl;
+	//	result = (*MyCloseAPI)();
 
 	return 0;
 }
@@ -179,7 +214,7 @@ int main(int argc, char **argv)
 
 void WaitForReach(  ){
 
-	int MyTolerence = 2;
+	int MyTolerence = 2;  // Tolérence en degré
 	bool ok = false;
 
 
@@ -189,14 +224,14 @@ void WaitForReach(  ){
 		usleep(50000);
 
 		///cout << "Still waiting..." << endl;
-		MyGetAngularCommand(currentCommand);
+		MyGetAngularCommand(AngularCommand);
 		ok = true;
-		ok = ok && abs(currentCommand.Actuators.Actuator1-pointToSend.Position.Actuators.Actuator1)<MyTolerence;
-		ok = ok && abs(currentCommand.Actuators.Actuator2-pointToSend.Position.Actuators.Actuator2)<MyTolerence;
-		ok = ok && abs(currentCommand.Actuators.Actuator3-pointToSend.Position.Actuators.Actuator3)<MyTolerence;
-		ok = ok && abs(currentCommand.Actuators.Actuator4-pointToSend.Position.Actuators.Actuator4)<MyTolerence;
-		ok = ok && abs(currentCommand.Actuators.Actuator5-pointToSend.Position.Actuators.Actuator5)<MyTolerence;
-		//ok = ok && abs(currentCommand.Actuators.Actuator6-pointToSend.Position.Actuators.Actuator6)<MyTolerence;
+		ok = ok && abs(AngularCommand.Actuators.Actuator1-pointToSend.Position.Actuators.Actuator1)<MyTolerence;
+		ok = ok && abs(AngularCommand.Actuators.Actuator2-pointToSend.Position.Actuators.Actuator2)<MyTolerence;
+		ok = ok && abs(AngularCommand.Actuators.Actuator3-pointToSend.Position.Actuators.Actuator3)<MyTolerence;
+		ok = ok && abs(AngularCommand.Actuators.Actuator4-pointToSend.Position.Actuators.Actuator4)<MyTolerence;
+		ok = ok && abs(AngularCommand.Actuators.Actuator5-pointToSend.Position.Actuators.Actuator5)<MyTolerence;
+		//ok = ok && abs(AngularCommand.Actuators.Actuator6-pointToSend.Position.Actuators.Actuator6)<MyTolerence;
 	}
 
 }
@@ -222,9 +257,9 @@ void ApplyVelocities(  ){
 
 	pointToSend.SynchroType = 0;
 	pointToSend.LimitationsActive = 0;
-	pointToSend.Limitations.speedParameter1 = 60;
-	pointToSend.Limitations.speedParameter2 = 60;
-	//pointToSend.Limitations.speedParameter3 = Speed;
+	pointToSend.Limitations.speedParameter1 = 100;
+	pointToSend.Limitations.speedParameter2 = 100;
+	//pointToSend.Limitations.speedParameter3 = 100;
 	pointToSend.Position.Type = ANGULAR_VELOCITY;
 	MySendAdvanceTrajectory(pointToSend);
 }
@@ -249,19 +284,19 @@ void Stop(  ){
 
 
 void SetJointRelPoint( int Joint, int Angle ){
-	MyGetAngularCommand(currentCommand);
+	MyGetAngularCommand(AngularCommand);
 	switch (Joint) {
-		case 1: pointToSend.Position.Actuators.Actuator1 = currentCommand.Actuators.Actuator1+Angle;
+		case 1: pointToSend.Position.Actuators.Actuator1 = AngularCommand.Actuators.Actuator1+Angle;
 		break;
-		case 2: pointToSend.Position.Actuators.Actuator2 = currentCommand.Actuators.Actuator2+Angle;
+		case 2: pointToSend.Position.Actuators.Actuator2 = AngularCommand.Actuators.Actuator2+Angle;
 		break;
-		case 3: pointToSend.Position.Actuators.Actuator3 = currentCommand.Actuators.Actuator3+Angle;
+		case 3: pointToSend.Position.Actuators.Actuator3 = AngularCommand.Actuators.Actuator3+Angle;
 		break;
-		case 4: pointToSend.Position.Actuators.Actuator4 = currentCommand.Actuators.Actuator4+Angle;
+		case 4: pointToSend.Position.Actuators.Actuator4 = AngularCommand.Actuators.Actuator4+Angle;
 		break;
-		case 5: pointToSend.Position.Actuators.Actuator5 = currentCommand.Actuators.Actuator5+Angle;
+		case 5: pointToSend.Position.Actuators.Actuator5 = AngularCommand.Actuators.Actuator5+Angle;
 		break;
-		case 6: pointToSend.Position.Actuators.Actuator6 = currentCommand.Actuators.Actuator6+Angle;
+		case 6: pointToSend.Position.Actuators.Actuator6 = AngularCommand.Actuators.Actuator6+Angle;
 		break;
 	}
 }
@@ -270,7 +305,7 @@ void SetJointRelPoint( int Joint, int Angle ){
 
 
 void SetJointGlobPoint( int Joint, int Angle ){
-	MyGetAngularCommand(currentCommand);
+	MyGetAngularCommand(AngularCommand);
 	switch (Joint) {
 		case 1: pointToSend.Position.Actuators.Actuator1 = Angle;
 		break;
@@ -318,8 +353,7 @@ void PrintInfo(){
 
 
 
-void Execute_sequence( Sequence Anim )
-{
+void Execute_sequence( Sequence Anim ){
 	Can_teleop = false;
 	int i;
 	for ( i = 0; i<Anim.Lenght; i++ ){
