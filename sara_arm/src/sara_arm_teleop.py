@@ -31,6 +31,7 @@ class desjardinsTeleop:
         self.sub = rospy.Subscriber('joy2', Joy, self.callback)
 
         self.pub = rospy.Publisher('teleop_arm', Int8MultiArray, queue_size=1)
+        self.anim_pub = rospy.Publisher('animation_arm', std_msgs::string, queue_size=1)
         self.eef_pub = rospy.Publisher('/CModelRobotOutput', eef_cmd, queue_size=1, latch=True)
         self.face_pub = rospy.Publisher('/control_emo', UInt8, queue_size=1, latch=True)
 
@@ -72,6 +73,17 @@ class desjardinsTeleop:
             self.face_pub.publish(1)
         elif joy.buttons[9] == 1:
             self.face_pub.publish(7)
+
+
+        # Add point to sequence
+        if joy.buttons[0] == 1:
+            self.anim_pub.publish("ajoute_point")
+        # Clear sequence
+        if joy.buttons[1] == 1:
+            self.anim_pub.publish("clear_sequence")
+        # Run sequence
+        if joy.buttons[2] == 1:
+            self.anim_pub.publish("jouer_sequence")
 
 
             #Trigger L and R must be on to use

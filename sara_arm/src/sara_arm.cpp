@@ -142,14 +142,18 @@ int main(int argc, char **argv)
 
 
 	Succes = false;
-
+	int nb_attemps = 1;
 	while( !Succes ) {
 
 		result = (*MyInitAPI)();
+		devicesCount = MyGetDevices(devices, result);
 
 		if ( result > 10 ){
 	  		cout << "* * *                  N O   A R M   F O U N D               * * *" << endl;
-	  		cout << "* * *            S E A R C H I N G   A G A I N . . .         * * *" << endl;
+	  		cout << "* * *                   A T T E M P   N B   " << nb_attemps << "              * * *" << endl;
+
+	  		cout << "* * *              S E A R C H I N G   A G A I N . . .       * * *" << endl;
+			nb_attemps ++;
 			sleep(1);
 
 	  	} else {
@@ -158,8 +162,8 @@ int main(int argc, char **argv)
 		}
 	}
 
-	devicesCount = MyGetDevices(devices, result);
 	cout << "Initialization's result :" << result << endl;
+	cout << "Number of attemps :" << nb_attemps << endl;
 
 
 	// ROS
@@ -176,6 +180,7 @@ int main(int argc, char **argv)
 
 	// inscription du node "animation" au topic "animation_arm"
 	sub = n.subscribe("animation_arm", 10, animation );
+
 
 	ros::spin();
 
