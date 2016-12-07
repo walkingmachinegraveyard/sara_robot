@@ -76,6 +76,11 @@ void animation( const std_msgs::String& msg )
 		Anim.Points[Anim.Lenght].Speed = 100;
 
 	}
+
+
+
+
+
 }
 
 
@@ -361,6 +366,13 @@ void PrintInfo(){
 
 
 void Execute_sequence( Sequence Anim ){
+
+/*	int a, b;
+	while (infile >> a >> b)
+	{
+	    // process pair (a,b)
+	}*/
+
 	Can_teleop = false;
 	int i;
 	for ( i = 0; i<Anim.Lenght; i++ ){

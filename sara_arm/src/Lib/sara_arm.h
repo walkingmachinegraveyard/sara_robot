@@ -14,6 +14,7 @@
 	#include "ros/ros.h"
 	#include "std_msgs/String.h"
 	#include "std_msgs/Int8MultiArray.h"
+	#include <fstream>
 
 
 	// Définition des structures
@@ -44,7 +45,8 @@
 	int (*MyGetSensorsInfo)(SensorsInfo &);
 	int (*MySetActuatorMaxVelocity)(float &);
 
-
+	// Fichier de sauvegarde d'animations
+//	std::ifstream infile("Sauvegarde.txt");
 
 	// Nodes:
 	void teleop(const std_msgs::Int8MultiArray& msg);  // Node qui lis un topic pour controler le bras en mode vélocité

@@ -17,7 +17,7 @@
 
 import rospy
 from sensor_msgs.msg import Joy
-from std_msgs.msg import Int8, Int8MultiArray, UInt8
+from std_msgs.msg import Int8, Int8MultiArray, UInt8, String
 from geometry_msgs.msg import Twist
 from math import pi, sin, cos, sqrt, atan2
 from robotiq_c_model_control.msg import CModel_robot_output as eef_cmd
@@ -31,7 +31,7 @@ class desjardinsTeleop:
         self.sub = rospy.Subscriber('joy2', Joy, self.callback)
 
         self.pub = rospy.Publisher('teleop_arm', Int8MultiArray, queue_size=1)
-        self.anim_pub = rospy.Publisher('animation_arm', std_msgs::string, queue_size=1)
+        self.anim_pub = rospy.Publisher('animation_arm', String, queue_size=1)
         self.eef_pub = rospy.Publisher('/CModelRobotOutput', eef_cmd, queue_size=1, latch=True)
         self.face_pub = rospy.Publisher('/control_emo', UInt8, queue_size=1, latch=True)
 
@@ -86,7 +86,7 @@ class desjardinsTeleop:
             self.anim_pub.publish("jouer_sequence")
 
 
-            #Trigger L and R must be on to use
+        #Trigger L and R must be on to use
         safety = float(joy.buttons[6]) * float(joy.buttons[7])
 
         # linear velocity
