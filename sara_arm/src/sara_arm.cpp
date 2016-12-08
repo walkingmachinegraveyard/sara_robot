@@ -6,25 +6,18 @@
 
 */
 
-
 #include "Lib/sara_arm.h"
 
 // Déclaration des variables utiles
 int result;  // Tampon de réception des résultats de certaines fonctions
 bool Can_teleop;  // Flag qui détermine si le node teleop est actif ou non
+int devicesCount;
+
 Sequence Anim;
 AngularPosition AngularCommand;
 TrajectoryPoint pointToSend;
 SensorsInfo Response;
-
-
-
-
 KinovaDevice devices[MAX_KINOVA_DEVICE];
-int devicesCount;
-
-
-
 
 int MyStartPosition[] = { 	180,
 							90,
@@ -33,13 +26,7 @@ int MyStartPosition[] = { 	180,
 							325,
 							0	};
 
-
-
-
 using namespace std;
-
-
-
 
 void teleop( const std_msgs::Int8MultiArray& msg )
 {
@@ -76,33 +63,11 @@ void animation( const std_msgs::String& msg )
 		Anim.Points[Anim.Lenght].Speed = 100;
 
 	}
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 int main(int argc, char **argv)
 {
-
-  	//string Animation = "CrazySara";
-
-
 
 	Anim.Lenght = 0;
 
@@ -141,10 +106,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-
-
 	cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
-
 
 	Succes = false;
 	int nb_attemps = 1;
@@ -170,7 +132,6 @@ int main(int argc, char **argv)
 	cout << "Initialization's result :" << result << endl;
 	cout << "Number of attemps :" << nb_attemps << endl;
 
-
 	// ROS
 	// Initialisation
 	ros::init(argc, argv, "sara_arm");
@@ -186,11 +147,7 @@ int main(int argc, char **argv)
 	// inscription du node "animation" au topic "animation_arm"
 	sub = n.subscribe("animation_arm", 10, animation );
 
-
 	ros::spin();
-
-
-
 
 	// dlclose(commandLayer_handle);
 
@@ -199,29 +156,6 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 void WaitForReach(  ){
@@ -249,9 +183,6 @@ void WaitForReach(  ){
 }
 
 
-
-
-
 void ApplyPoint( int Speed ){
 
 	pointToSend.SynchroType = 1;
@@ -262,7 +193,6 @@ void ApplyPoint( int Speed ){
 	pointToSend.Position.Type = ANGULAR_POSITION;
 	MySendAdvanceTrajectory(pointToSend);
 }
-
 
 
 void ApplyVelocities(  ){
@@ -277,9 +207,6 @@ void ApplyVelocities(  ){
 }
 
 
-
-
-
 void Stop(  ){
 
 	MyEraseAllTrajectories();
@@ -292,7 +219,6 @@ void Stop(  ){
 
 
 }
-
 
 
 void SetJointRelPoint( int Joint, int Angle ){
@@ -312,8 +238,6 @@ void SetJointRelPoint( int Joint, int Angle ){
 		break;
 	}
 }
-
-
 
 
 void SetJointGlobPoint( int Joint, int Angle ){
@@ -336,9 +260,6 @@ void SetJointGlobPoint( int Joint, int Angle ){
 
 
 
-
-
-
 // Function to go to the hardcoded starting position
 void MyGoToStart( ){
 
@@ -354,7 +275,6 @@ void MyGoToStart( ){
 }
 
 
-
 void PrintInfo(){
 
 	MyGetSensorsInfo( Response );
@@ -362,7 +282,6 @@ void PrintInfo(){
 	cout << "Tension = " << Response.Voltage << endl;
 
 }
-
 
 
 void Execute_sequence( Sequence Anim ){
