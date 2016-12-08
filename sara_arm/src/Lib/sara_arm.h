@@ -14,16 +14,17 @@
 	#include "ros/ros.h"
 	#include "std_msgs/String.h"
 	#include "std_msgs/Int8MultiArray.h"
+	#include "std_msgs/Int8.h"
 	#include <fstream>
 
 
 	// Définition des structures
 	struct PointDeSquence {
 		int Speed;
-		int Joints[6];
+		int Joints[10];
 	};
 	struct Sequence {
-		PointDeSquence Points[];
+		PointDeSquence Points[1000];
 		int Lenght;
 	};
 
@@ -46,7 +47,7 @@
 	int (*MySetActuatorMaxVelocity)(float &);
 
 	// Fichier de sauvegarde d'animations
-//	std::ifstream infile("Sauvegarde.txt");
+    //	std::ifstream infile("Sauvegarde.txt");
 
 	// Nodes:
 	void teleop(const std_msgs::Int8MultiArray& msg);  // Node qui lis un topic pour controler le bras en mode vélocité

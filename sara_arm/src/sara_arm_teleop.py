@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-# SARA teleoperation
 # input: sensor_msgs/Joy
 # output: geometry_msgs/Twist
 
@@ -33,9 +31,9 @@ from robotiq_c_model_control.msg import CModel_robot_input as eef_status
 class desjardinsTeleop:
 
     def __init__(self):
-
+        self.pinceState = 1
         self.sub = rospy.Subscriber('joy2', Joy, self.callback)
-
+        self.sub = rospy.Subscriber('animation_pince', Int8, self.callback2)
         self.pub = rospy.Publisher('teleop_arm', Int8MultiArray, queue_size=1)
         self.anim_pub = rospy.Publisher('animation_arm', String, queue_size=1)
         self.eef_pub = rospy.Publisher(
@@ -44,6 +42,10 @@ class desjardinsTeleop:
         self.face_pub = rospy.Publisher(
             '/control_emo', UInt8, queue_size=1, latch=True
         )
+
+        self.Bouton_A = True
+        self.Bouton_B = True
+        self.Bouton_C = True
 
         hand_cmd = eef_cmd()
         hand_cmd.rACT = 1  # activate gripper
@@ -57,16 +59,43 @@ class desjardinsTeleop:
         # divisor = rospy.get_param('angular_vel_div', 6)
         # self.maxAngularVelocity = pi/divisor
 
+    def openPince():
+        hand_cmd = eef_cmd()
+        hand_cmd.rACT = 1
+    	hand_cmd.rGTO = 1
+    	hand_cmd.rSP = 200
+    	hand_cmd.rFR = 0
+    	hand_cmd.rPR = 0
+    	self.eef_pub.publish(hand_cmd)
+
+    def closePince():
+    	hand_cmd = eef_cmd()
+    	hand_cmd.rACT = 1
+    	hand_cmd.rGTO = 1
+    	hand_cmd.rSP = 200
+    	hand_cmd.rFR = 0
+    	hand_cmd.rPR = 250
+    	self.eef_pub.publish(hand_cmd)
+
+    def callback2(self, pince):
+        if pince == 0:
+            closePince()
+        else:
+            openPince()
+
     def callback(self, joy):
 
-        # twist = Twist()
+        safety = float(joy.buttons[6]) * float(joy.buttons[7])
+	# twist = Twist()
         if joy.buttons[13] == 1:
-            hand_cmd = eef_cmd()
+	   # openPince()
+	    hand_cmd = eef_cmd()
             hand_cmd.rACT = 1  # activate gripper
             hand_cmd.rGTO = 1  # request to go to position
             hand_cmd.rSP = 200  # set activation speed(0[slowest]-255[fastest])
             hand_cmd.rFR = 0  # set force limit (0[min] - 255[max])
             hand_cmd.rPR = 0  # request to open
+            self.pinceState = 1
             self.eef_pub.publish(hand_cmd)
 
         elif joy.buttons[14] == 1:
@@ -76,8 +105,9 @@ class desjardinsTeleop:
             hand_cmd.rSP = 200  # set activation speed(0[slowest]-255[fastest])
             hand_cmd.rFR = 0  # set force limit (0[min] - 255[max])
             hand_cmd.rPR = 250  # request to close
+            self.pinceState = 0
             self.eef_pub.publish(hand_cmd)
-
+	   # closePince()
         if joy.buttons[8] == 1:
             self.face_pub.publish(1)
         elif joy.buttons[9] == 1:
@@ -85,23 +115,34 @@ class desjardinsTeleop:
 
         # Add point to sequence
         if joy.buttons[0] == 1:
-            self.anim_pub.publish("ajoute_point")
+            if self.Bouton_A:
+                self.anim_pub.publish("ajoute_point")
+                self.Bouton_A = False
+        else:
+            self.Bouton_A = True
+
         # Clear sequence
         if joy.buttons[1] == 1:
-            self.anim_pub.publish("clear_sequence")
+            if self.Bouton_B:
+                self.anim_pub.publish("clear_sequence")
+                self.Bouton_B = False
+        else:
+            self.Bouton_B = True
+
         # Run sequence
-        if joy.buttons[2] == 1:
-            self.anim_pub.publish("jouer_sequence")
+        if joy.buttons[2] * safety == 1:
+            if self.Bouton_C:
+                self.anim_pub.publish("jouer_sequence")
+                self.Bouton_C = False
+        else:
+            self.Bouton_C = True
 
         # Trigger L and R must be on to use
-        safety = float(joy.buttons[6]) * float(joy.buttons[7])
 
         # linear velocity
         # vLinear = safety * sqrt(joy.axes[0]**2 + joy.axes[1]**2)
-
         # movement orientation
         # Heading = atan2(joy.axes[0], joy.axes[1])
-
         # x axis linear velocity
         # twist.linear.x = self.maxLinearVelocity * vLinear * cos(Heading)
         # y axis linear velocity
@@ -116,9 +157,10 @@ class desjardinsTeleop:
         arm.data.append(safety * joy.axes[2] * 100)
         arm.data.append(safety * joy.axes[3] * -100)
         arm.data.append(safety * (
-            float(joy.buttons[4])*100 - float(joy.buttons[5])*100)
+            float(joy.buttons[4]) * 100 - float(joy.buttons[5]) * 100)
         )
         arm.data.append(0)
+        arm.data.append( self.pinceState )
         self.pub.publish(arm)
 
 
