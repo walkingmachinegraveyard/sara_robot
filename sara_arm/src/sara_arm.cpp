@@ -13,6 +13,7 @@ int result;  // Tampon de réception des résultats de certaines fonctions
 bool Allow_teleop;  // Flag qui détermine si le node teleop est actif ou non
 int devicesCount;
 bool Etat_pince;
+bool Bouton_AU;
 ros::Publisher pub_anim_pince;
 
 Sequence Anim;
@@ -32,7 +33,7 @@ using namespace std;
 
 void teleop(const std_msgs::Int8MultiArray& msg) {
     // Si permis
-    if (Allow_teleop == 1) {
+    if (Allow_teleop == 1 && !Bouton_AU) {
         SetJointGlobPoint(1, msg.data[0]);
         SetJointGlobPoint(2, msg.data[1]);
         SetJointGlobPoint(3, msg.data[2]);
@@ -77,6 +78,29 @@ void animation(const std_msgs::String& msg) {
           cout << "Lenght " << Anim.Lenght << endl;
     }
 }
+
+
+
+
+
+void AU(const std_msgs::Bool& msg) {
+    Bouton_AU = msg.data;
+    if ( Bouton_AU ) {
+        Stop();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 int main(int argc, char **argv) {
@@ -156,6 +180,9 @@ int main(int argc, char **argv) {
     // inscription du callback "animation" au topic "animation_arm"
     ros::Subscriber sub_anim = n.subscribe("animation_arm", 10, animation);
 
+    // inscription du callback "AU" au topic ""
+    ros::Subscriber sub_AU = n.subscribe("emergency_stop", 10, AU);
+
     // Annoncement au topic "animation_arm"
     pub_anim_pince = n.advertise<std_msgs::Int8>("animation_pince", 10);
 
@@ -181,13 +208,12 @@ void WaitForReach() {
 
         MyGetAngularCommand(AngularCommand);
         ok = true;
-        var act = AngularCommand.Actuators;
-        ok = ok && abs(act.Actuator1-pointToSend.Position.Actuators.Actuator1) < MyTolerence;
-        ok = ok && abs(act.Actuator2-pointToSend.Position.Actuators.Actuator2) < MyTolerence;
-        ok = ok && abs(act.Actuator3-pointToSend.Position.Actuators.Actuator3) < MyTolerence;
-        ok = ok && abs(act.Actuator4-pointToSend.Position.Actuators.Actuator4) < MyTolerence;
-        ok = ok && abs(act.Actuator5-pointToSend.Position.Actuators.Actuator5) < MyTolerence;
-        // ok = ok && abs(act.Actuator6-pointToSend.Position.Actuators.Actuator6) < MyTolerence;
+        ok = ok && abs(AngularCommand.Actuators.Actuator1-pointToSend.Position.Actuators.Actuator1) < MyTolerence;
+        ok = ok && abs(AngularCommand.Actuators.Actuator2-pointToSend.Position.Actuators.Actuator2) < MyTolerence;
+        ok = ok && abs(AngularCommand.Actuators.Actuator3-pointToSend.Position.Actuators.Actuator3) < MyTolerence;
+        ok = ok && abs(AngularCommand.Actuators.Actuator4-pointToSend.Position.Actuators.Actuator4) < MyTolerence;
+        ok = ok && abs(AngularCommand.Actuators.Actuator5-pointToSend.Position.Actuators.Actuator5) < MyTolerence;
+        // ok = ok && abs(AngularCommand.Actuators.Actuator6-pointToSend.Position.Actuators.Actuator6) < MyTolerence;
     }
 }
 
@@ -299,17 +325,20 @@ void Execute_sequence(Sequence Anim) {
     Allow_teleop = false;
     int i;
     for (i = 0; i < Anim.Lenght; i++) {
-        ROS_INFO("* * *              point       * * *");
+        if (!Bouton_AU) {
+            ROS_INFO("* * *              point       * * *");
 
-        SetJointGlobPoint(1, Anim.Points[i].Joints[0]);
-        SetJointGlobPoint(2, Anim.Points[i].Joints[1]);
-        SetJointGlobPoint(3, Anim.Points[i].Joints[2]);
-        SetJointGlobPoint(4, Anim.Points[i].Joints[3]);
-        SetJointGlobPoint(5, Anim.Points[i].Joints[4]);
-        SetJointGlobPoint(6, Anim.Points[i].Joints[5]);
-        pub_anim_pince.publish(Anim.Points[i].Joints[6]);
-        ApplyPoint(Anim.Points[i].Speed);
-        WaitForReach();
+            SetJointGlobPoint(1, Anim.Points[i].Joints[0]);
+            SetJointGlobPoint(2, Anim.Points[i].Joints[1]);
+            SetJointGlobPoint(3, Anim.Points[i].Joints[2]);
+            SetJointGlobPoint(4, Anim.Points[i].Joints[3]);
+            SetJointGlobPoint(5, Anim.Points[i].Joints[4]);
+            SetJointGlobPoint(6, Anim.Points[i].Joints[5]);
+            pub_anim_pince.publish(Anim.Points[i].Joints[6]);
+            ApplyPoint(Anim.Points[i].Speed);
+            usleep(500000);
+            WaitForReach();
+        }
     }
 
     Allow_teleop = true;

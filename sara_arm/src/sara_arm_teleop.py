@@ -59,7 +59,8 @@ class desjardinsTeleop:
         # divisor = rospy.get_param('angular_vel_div', 6)
         # self.maxAngularVelocity = pi/divisor
 
-    def openPince():
+    #global openPince
+    def openPince(self):
         hand_cmd = eef_cmd()
         hand_cmd.rACT = 1
     	hand_cmd.rGTO = 1
@@ -67,8 +68,10 @@ class desjardinsTeleop:
     	hand_cmd.rFR = 0
     	hand_cmd.rPR = 0
     	self.eef_pub.publish(hand_cmd)
+        self.pinceState = 1
 
-    def closePince():
+    #global closePince
+    def closePince(self):
     	hand_cmd = eef_cmd()
     	hand_cmd.rACT = 1
     	hand_cmd.rGTO = 1
@@ -76,38 +79,23 @@ class desjardinsTeleop:
     	hand_cmd.rFR = 0
     	hand_cmd.rPR = 250
     	self.eef_pub.publish(hand_cmd)
+        self.pinceState = 0
 
     def callback2(self, pince):
-        if pince == 0:
-            closePince()
+        print("Reception:"+str(pince))
+        if pince.data == 1:
+            self.openPince()
         else:
-            openPince()
+            self.closePince()
 
     def callback(self, joy):
 
         safety = float(joy.buttons[6]) * float(joy.buttons[7])
 	# twist = Twist()
         if joy.buttons[13] == 1:
-	   # openPince()
-	    hand_cmd = eef_cmd()
-            hand_cmd.rACT = 1  # activate gripper
-            hand_cmd.rGTO = 1  # request to go to position
-            hand_cmd.rSP = 200  # set activation speed(0[slowest]-255[fastest])
-            hand_cmd.rFR = 0  # set force limit (0[min] - 255[max])
-            hand_cmd.rPR = 0  # request to open
-            self.pinceState = 1
-            self.eef_pub.publish(hand_cmd)
-
+            self.openPince()
         elif joy.buttons[14] == 1:
-            hand_cmd = eef_cmd()
-            hand_cmd.rACT = 1  # activate gripper
-            hand_cmd.rGTO = 1  # request to go to position
-            hand_cmd.rSP = 200  # set activation speed(0[slowest]-255[fastest])
-            hand_cmd.rFR = 0  # set force limit (0[min] - 255[max])
-            hand_cmd.rPR = 250  # request to close
-            self.pinceState = 0
-            self.eef_pub.publish(hand_cmd)
-	   # closePince()
+            self.closePince()
         if joy.buttons[8] == 1:
             self.face_pub.publish(1)
         elif joy.buttons[9] == 1:
