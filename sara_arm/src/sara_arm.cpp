@@ -46,6 +46,8 @@ void teleop(const std_msgs::Int8MultiArray& msg) {
 }
 
 
+
+
 void animation(const std_msgs::String& msg) {
     cout << msg << endl;
 
@@ -82,7 +84,6 @@ void animation(const std_msgs::String& msg) {
 
 
 
-
 void AU(const std_msgs::Bool& msg) {
     Bouton_AU = msg.data;
     if ( Bouton_AU ) {
@@ -93,23 +94,21 @@ void AU(const std_msgs::Bool& msg) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 int main(int argc, char **argv) {
     Etat_pince = true;
     Anim.Lenght = 0;
     Allow_teleop = true;
     bool Succes = false;
 
+
     pointToSend.InitStruct();
+
+    float MaxVel[6];
+    int i;
+    for (i=0; i < 6; i++)
+        MaxVel[i] = 10.0f;
+    MySetActuatorMaxVelocity(*MaxVel);
+
 
 
     while (!Succes) {
@@ -186,7 +185,11 @@ int main(int argc, char **argv) {
     // Annoncement au topic "animation_arm"
     pub_anim_pince = n.advertise<std_msgs::Int8>("animation_pince", 10);
 
-    ros::spin();
+
+    // ros::spin();
+    ros::MultiThreadedSpinner spinner(4); // Use 4 threads
+    spinner.spin();
+
 
     // dlclose(commandLayer_handle);
 
@@ -200,7 +203,6 @@ int main(int argc, char **argv) {
 void WaitForReach() {
     int MyTolerence = 2;  // Tolérence en degré
     bool ok = false;
-    // MySetActuatorMaxVelocity({10.0f,10.0f,10.0f,10.0f,10.0f,10.0f});
 
     cout << "Waiting for reach" << endl;
     while (!ok) {
