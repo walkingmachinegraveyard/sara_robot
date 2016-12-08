@@ -102,13 +102,13 @@ int main(int argc, char **argv) {
 
 
     pointToSend.InitStruct();
-
+/*
     float MaxVel[6];
     int i;
     for (i=0; i < 6; i++)
         MaxVel[i] = 10.0f;
     MySetActuatorMaxVelocity(*MaxVel);
-
+*/
 
 
     while (!Succes) {
@@ -216,6 +216,7 @@ void WaitForReach() {
         ok = ok && abs(AngularCommand.Actuators.Actuator4-pointToSend.Position.Actuators.Actuator4) < MyTolerence;
         ok = ok && abs(AngularCommand.Actuators.Actuator5-pointToSend.Position.Actuators.Actuator5) < MyTolerence;
         // ok = ok && abs(AngularCommand.Actuators.Actuator6-pointToSend.Position.Actuators.Actuator6) < MyTolerence;
+        ok = ok || Bouton_AU;
     }
 }
 
