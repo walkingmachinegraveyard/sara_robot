@@ -18,6 +18,7 @@ import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
 from math import pi, sin, cos, sqrt, atan2
+import os
 
 
 class MecanumTeleop:
@@ -54,12 +55,13 @@ class MecanumTeleop:
         # YAW axis rotational velocity
         twist.angular.z = self.maxAngularVelocity * safety * (joy.axes[2]) / 2.0
 
+        # call the service to clear the costmap and unknow space
         if joy.buttons[0]:
             clear_costmap = rospy.ServiceProxy('clear_costmap', std_srvs.srv.Empty)
             clear_unknown_space = rospy.ServiceProxy('clear_unknown_space', std_srvs.srv.Empty)
 
         if joy.buttons[1]:
-            pass
+            os.system("rostopic pub /move_base/cancel actionlib_msgs/GoalID -- {}")
 
         self.pubFLW.publish(twist)
 
