@@ -63,7 +63,7 @@ class MecanumTeleop:
             clear_unknown_space = rospy.ServiceProxy('clear_unknown_space', std_srvs.srv.Empty)
 
         if joy.buttons[1]:
-            os.system("rostopic pub /move_base/cancel actionlib_msgs/GoalID -- {}")
+            os.system("rostopic pub --once /move_base/cancel actionlib_msgs/GoalID -- {}")
 
         self.pubFLW.publish(twist)
 
