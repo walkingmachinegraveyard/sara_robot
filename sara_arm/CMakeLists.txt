@@ -137,7 +137,6 @@ include_directories(
 
 ## Declare a C++ executable
 add_executable( sara_arm    src/sara_arm.cpp
-				            #src/sara_arm_teleop.cpp
 				)
 
 ## Add cmake target dependencies of the executable
