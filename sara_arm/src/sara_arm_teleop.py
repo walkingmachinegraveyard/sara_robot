@@ -34,6 +34,9 @@ class desjardinsTeleop:
         self.pinceState = 1
         self.sub = rospy.Subscriber('joy2', Joy, self.callback)
         self.sub = rospy.Subscriber('animation_pince', Int8, self.callback2)
+        self.sub = rospy.Subscriber('emergency_stop', std_msgs::Bool, self.Callback_eStop)
+
+
         self.pub = rospy.Publisher('teleop_arm', Int8MultiArray, queue_size=1)
         self.anim_pub = rospy.Publisher('animation_arm', String, queue_size=1)
         self.eef_pub = rospy.Publisher(
@@ -43,6 +46,7 @@ class desjardinsTeleop:
             '/control_emo', UInt8, queue_size=1, latch=True
         )
 
+        self.eStop = False
         self.Bouton_A = True
         self.Bouton_B = True
         self.Bouton_C = True
@@ -90,7 +94,7 @@ class desjardinsTeleop:
 
     def callback(self, joy):
 
-        safety = float(joy.buttons[6]) * float(joy.buttons[7])
+        safety = float(joy.buttons[6]) * float(joy.buttons[7]) * eStop
 	# twist = Twist()
         if joy.buttons[13] == 1:
             self.openPince()
@@ -150,12 +154,13 @@ class desjardinsTeleop:
         arm.data.append(0)
         arm.data.append( self.pinceState )
         self.pub.publish(arm)
-
+    def Callback_eStop( self, Status ):
+        self.eStop = Status
 
 if __name__ == '__main__':
 
     try:
-        rospy.init_node('desjardinsTeleop')
+        rospy.init_node('SaraArmTeleop')
 
         desjardinsTeleop()
 
