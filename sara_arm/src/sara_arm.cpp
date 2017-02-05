@@ -1,3 +1,4 @@
+// Copyright[2017] <Walking Machine> [copyright]
 /*
  SARA arm
  input: std_msgs::Int8MultiArray&
