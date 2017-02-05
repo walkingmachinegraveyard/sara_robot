@@ -1,27 +1,29 @@
 #ifndef ARM_H_I
 #define ARM_H_I
 
-    #include <list>
-    #include <hardware_interface/joint_command_interface.h>
-    #include <hardware_interface/joint_state_interface.h>
-    #include <hardware_interface/robot_hw.h>
-    #include <iostream>
-    #include <dlfcn.h>
-    #include <vector>
-    #include <Kinova.API.CommLayerUbuntu.h>
-    #include <KinovaTypes.h>
-    #include <stdio.h>
-    #include <unistd.h>
-    #include <stdlib.h>
-    #include <cmath>
-    #include <string>
-    #include <fstream>
-    #include "ros/ros.h"
-    #include "std_msgs/String.h"
-    #include "std_msgs/Int8MultiArray.h"
-    #include "std_msgs/Int8.h"
-    #include "std_msgs/Bool.h"
-    const NOMBRE_DE_MOTEURS = 5;
+#include "Lib/sara_arm_hardware_interface.h"
+#include <hardware_interface/joint_command_interface.h>
+#include <hardware_interface/joint_state_interface.h>
 
+
+const int NOMBRE_DE_MOTEURS = 5;
+
+class MyRobot : public hardware_interface::RobotHW {
+    public:
+        MyRobot();
+        void init();
+
+    private:
+        hardware_interface::JointStateInterface jnt_state_interface;
+        hardware_interface::PositionJointInterface jnt_pos_interface;
+        double cmd[NOMBRE_DE_MOTEURS];
+        double pos[NOMBRE_DE_MOTEURS];
+        double vel[NOMBRE_DE_MOTEURS];
+        double eff[NOMBRE_DE_MOTEURS];
+
+        void RunRobot();
+
+        void UpdateState();
+};
 
 #endif
