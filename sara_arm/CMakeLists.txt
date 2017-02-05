@@ -108,7 +108,6 @@ generate_messages(DEPENDENCIES std_msgs sensor_msgs wm_arm_msgs)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS src/Lib
-#  LIBRARIES wm_arm_driver
   CATKIN_DEPENDS actionlib actionlib_msgs roscpp rospy wm_arm_msgs
   DEPENDS Eigen
 )
@@ -136,7 +135,9 @@ include_directories(
 # add_dependencies(wm_arm_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable( sara_arm    src/sara_arm.cpp
+add_executable(
+   # sara_arm    src/sara_arm.cpp
+    sara_arm    src/sara_arm_hardware_interface.cpp
 				)
 
 ## Add cmake target dependencies of the executable
