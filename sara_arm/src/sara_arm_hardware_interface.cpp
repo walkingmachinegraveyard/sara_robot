@@ -109,9 +109,11 @@ MyRobot::MyRobot() {
 
 
 
-void MyRobot::RunRobot() {
+void MyRobot::Update() {
     float positionList[NOMBRE_DE_MOTEURS];
     float VelocityList[NOMBRE_DE_MOTEURS];
+    TrajectoryPoint pointToSend;
+
     MyGetActuatorsPosition(PositionList);
     MyGetActuatorsPosition(VelocityList);
     for (int i=0; i < NOMBRE_DE_MOTEURS; i++) {
@@ -121,22 +123,16 @@ void MyRobot::RunRobot() {
         // eff[i] = 0.0F;
 
 
-        //  << ---- E X E C U T E   O R D E R S ---- >>
-        if ( cmd ) {
-
-        }
-
     }
-    pointToSend.SynchroType = 0;
-    pointToSend.LimitationsActive = 0;
-    pointToSend.Limitations.speedParameter1 = 100;
-    pointToSend.Limitations.speedParameter2 = 100;
-    pointToSend.Limitations.speedParameter3 = 100;
-    pointToSend.Position.Type = ANGULAR_VELOCITY;
+    //  << ---- E X E C U T E   O R D E R S ---- >>
+
+    //pointToSend.SynchroType = 0;
+    //pointToSend.LimitationsActive = 0;
+    //pointToSend.Limitations.speedParameter1 = 100;
+    //pointToSend.Limitations.speedParameter2 = 100;
+    //pointToSend.Limitations.speedParameter3 = 100;
+    //pointToSend.Position.Type = ANGULAR_VELOCITY;
     MySendAdvanceTrajectory(pointToSend);
-
-
-
 }
 
 

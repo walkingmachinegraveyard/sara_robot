@@ -14,6 +14,7 @@ class MyRobot : public hardware_interface::RobotHW {
         void init();
 
     private:
+        int
         hardware_interface::JointStateInterface jnt_state_interface;
         hardware_interface::PositionJointInterface jnt_pos_interface;
         double cmd[NOMBRE_DE_MOTEURS];
@@ -21,9 +22,7 @@ class MyRobot : public hardware_interface::RobotHW {
         double vel[NOMBRE_DE_MOTEURS];
         double eff[NOMBRE_DE_MOTEURS];
 
-        void RunRobot();
-
-        void UpdateState();
+        void Update();
 };
 
 #endif
