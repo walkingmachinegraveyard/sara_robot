@@ -37,15 +37,17 @@ class MyRobot : public hardware_interface::RobotHW {
     public:
         MyRobot();
         void init();
+        void Read();
+        void Write();
 
     private:
-        hardware_interface::JointStateInterface jnt_state_interface;
-        hardware_interface::VelocityJointInterface VelocityJointInterface;
+        hardware_interface::VelocityJointInterface joint_velocity_interface_;
+        hardware_interface::JointStateInterface    joint_state_interface_;
+        hardware_interface::JointStateHandle       joint_state_Handle_;
         double cmd[NOMBRE_DE_MOTEURS_KINOVA];
         double pos[NOMBRE_DE_MOTEURS_KINOVA];
         double vel[NOMBRE_DE_MOTEURS_KINOVA];
         double eff[NOMBRE_DE_MOTEURS_KINOVA];
-        void Update();
 };
 
 #endif

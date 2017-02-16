@@ -1,6 +1,7 @@
 // Copyright[2017] <Walking Machine> [copyright]
 
 #include <hardware_interface/joint_command_interface.h>
+#include <controller_manager/controller_manager.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <Kinova.API.CommLayerUbuntu.h>
@@ -25,8 +26,94 @@
 #include <stdio.h>
 
 
+
+
+
+
+
+
+
+
+
+MyRobot::MyRobot() {
+    // connect and register the joint state interface
+    ROS_INFO("--1--");
+    int i = 0;
+    std::string Name;
+    Name = "Motor"+boost::lexical_cast<std::string>(i+1);
+    joint_state_interface_.registerHandle(hardware_interface::JointStateHandle( Name, &pos[i], &vel[i], &eff[i++]));
+    ROS_INFO("--2--");
+    registerInterface(&joint_state_interface_);
+    ROS_INFO("--3--");
+    i = 0;
+    // connect and register the joint velocity interface
+    Name = "Motor"+boost::lexical_cast<std::string>(i+1);
+    joint_velocity_interface_.registerHandle(hardware_interface::JointHandle(joint_state_interface_.getHandle(Name), &cmd[i++]));
+
+    ROS_INFO("--4--");
+
+    registerInterface(&joint_velocity_interface_);
+
+}
+
+
+
+void MyRobot::Read() {
+
+    //ROS_INFO("--1--");
+    /*
+    float PositionList[NOMBRE_DE_MOTEURS_KINOVA];
+    float VelocityList[NOMBRE_DE_MOTEURS_KINOVA];
+    MyGetActuatorsPosition(PositionList);
+    MyGetActuatorsPosition(VelocityList);
+    */
+   // ROS_INFO("--2--");
+    for (int i=0; i < NOMBRE_DE_MOTEURS_KINOVA; i++) {
+        // << ----  U P D A T E   S T A T U S  ---- >>
+/*
+        ROS_INFO("--2--");
+
+        pos[i] = PositionList[i];
+        vel[i] = VelocityList[i];
+        // eff[i] = 0.0F;
+*/
+    }
+}
+
+
+
+void MyRobot::Write() {
+    TrajectoryPoint pointToSend;
+    //  << ---- E X E C U T E   O R D E R S ---- >>
+    /*
+    pointToSend.SynchroType = 0;
+    pointToSend.LimitationsActive = 0;
+    pointToSend.Limitations.speedParameter1 = 100;
+    pointToSend.Limitations.speedParameter2 = 100;
+    pointToSend.Limitations.speedParameter3 = 100;
+    pointToSend.Position.Type = ANGULAR_VELOCITY;
+    MySendAdvanceTrajectory(pointToSend);
+     */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(int argc, char **argv) {
 
+    ROS_INFO("--e--");
     bool Succes = false;
     while (!Succes) {
         // We load the library
@@ -53,16 +140,20 @@ int main(int argc, char **argv) {
         // << ----   I N I T I A L I S A T I O N   ---- >>
         if ((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MySendBasicTrajectory == NULL) ||
             (MySendAdvanceTrajectory == NULL) || (MyMoveHome == NULL) || (MyInitFingers == NULL)) {
-            //      cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
+                  //cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
             //     cout << "* * *          T R Y I N G   A G A I N   I N   A  S E C      * * *" << endl;
             sleep(1);
         } else {
             Succes = true;
         }
     }
+
+
     Succes = false;
     int nb_attemps = 1;
     while (!Succes) {
+
+        ROS_INFO("--d--");
         result = (*MyInitAPI)();
         devicesCount = MyGetDevices(devices, result);
         if (result != 1) {
@@ -75,87 +166,42 @@ int main(int argc, char **argv) {
             Succes = true;
             //       cout << "* * *                    A R M   F O U N D                 * * *" << endl;
         }
+        Succes = true;
+
     }
 //    cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
     //   cout << "Initialization's result :" << result << endl;
 //    cout << "Number of attemps :" << nb_attemps << endl;
+
     // ROS
     // Initialisation
+
+    ROS_INFO("--c--");
     ros::init(argc, argv, "sara_arm");
+    ROS_INFO("--c1--");
     // Obtention du nodehandle
     ros::NodeHandle n;
+    ROS_INFO("--c2--");
     // ros::spin();
     ros::MultiThreadedSpinner spinner(4);  // Use 4 threads
-    spinner.spin();
-}
+    ROS_INFO("--c3--");
+    ros::Duration period(0.02);
+    ROS_INFO("--c4--");
+    // Création de l'instance de Sara
+    MyRobot Sara;
+    ROS_INFO("--c5--");
+    ROS_INFO("--b--");
 
-MyRobot::MyRobot() {
-    // connect and register the joint state interface
-    hardware_interface::JointStateHandle state_handle_Motor1("Motor1", &pos[0], &vel[0], &eff[0]);
-    jnt_state_interface.registerHandle(state_handle_Motor1);
-    hardware_interface::JointStateHandle state_handle_Motor2("Motor2", &pos[1], &vel[1], &eff[1]);
-    jnt_state_interface.registerHandle(state_handle_Motor2);
-    hardware_interface::JointStateHandle state_handle_Motor3("Motor3", &pos[2], &vel[2], &eff[2]);
-    jnt_state_interface.registerHandle(state_handle_Motor3);
-    hardware_interface::JointStateHandle state_handle_Motor4("Motor4", &pos[3], &vel[3], &eff[3]);
-    jnt_state_interface.registerHandle(state_handle_Motor4);
-    hardware_interface::JointStateHandle state_handle_Motor5("Motor5", &pos[4], &vel[4], &eff[4]);
-    jnt_state_interface.registerHandle(state_handle_Motor5);
-    /*
-    hardware_interface::JointStateHandle state_handle_Motor6("Motor6", &pos[5], &vel[5], &eff[5]);
-    jnt_state_interface.registerHandle(state_handle_Motor6);
-    hardware_interface::JointStateHandle state_handle_Motor7("Motor7", &pos[6], &vel[6], &eff[6]);
-    jnt_state_interface.registerHandle(state_handle_Motor7);
-    */
-    registerInterface(&jnt_state_interface);
-
-    // connect and register the joint velocity interface
-    hardware_interface::JointHandle vel_handle_Motor1(VelocityJointInterface.getHandle("Motor1"), &cmd[0]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor1);
-    hardware_interface::JointHandle vel_handle_Motor2(VelocityJointInterface.getHandle("Motor2"), &cmd[1]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor2);
-    hardware_interface::JointHandle vel_handle_Motor3(VelocityJointInterface.getHandle("Motor3"), &cmd[2]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor3);
-    hardware_interface::JointHandle vel_handle_Motor4(VelocityJointInterface.getHandle("Motor4"), &cmd[3]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor4);
-    hardware_interface::JointHandle vel_handle_Motor5(VelocityJointInterface.getHandle("Motor5"), &cmd[4]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor5);
-    /*
-    hardware_interface::JointHandle vel_handle_Motor6(VelocityJointInterface.getHandle("Motor6"), &cmd[3]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor6);
-    hardware_interface::JointHandle vel_handle_Motor7(VelocityJointInterface.getHandle("Motor7"), &cmd[4]);
-    VelocityJointInterface.registerHandle(vel_handle_Motor7);
-    */
-    registerInterface(&VelocityJointInterface);
-
-}
-
-
-
-void MyRobot::Update() {
-    float PositionList[NOMBRE_DE_MOTEURS_KINOVA];
-    float VelocityList[NOMBRE_DE_MOTEURS_KINOVA];
-    TrajectoryPoint pointToSend;
-
-    MyGetActuatorsPosition(PositionList);
-    MyGetActuatorsPosition(VelocityList);
-    for (int i=0; i < NOMBRE_DE_MOTEURS_KINOVA; i++) {
-        // << ----  U P D A T E   S T A T U S  ---- >>
-        pos[i] = PositionList[i];
-        vel[i] = VelocityList[i];
-        // eff[i] = 0.0F;
-
+    controller_manager::ControllerManager cm(&Sara, n);
+    while (ros::ok())
+    {
+      //  ROS_INFO("--a1--");
+        Sara.Read();
+     //   ROS_INFO("--a2--");
+        cm.update(ros::Time::now(), period);
+      //  ROS_INFO("--a3--");
+        Sara.Write();
     }
-    //  << ---- E X E C U T E   O R D E R S ---- >>
-    pointToSend.SynchroType = 0;
-    pointToSend.LimitationsActive = 0;
-    pointToSend.Limitations.speedParameter1 = 100;
-    pointToSend.Limitations.speedParameter2 = 100;
-    pointToSend.Limitations.speedParameter3 = 100;
-    pointToSend.Position.Type = ANGULAR_VELOCITY;
-    MySendAdvanceTrajectory(pointToSend);
+    spinner.spin();
+
 }
-
-
-
-

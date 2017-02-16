@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   wm_arm_msgs
+  controller_manager
+  hardware_interface
 )
 
 ## System dependencies are found with CMake's conventions

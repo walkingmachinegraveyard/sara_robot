@@ -6,11 +6,16 @@
    <rosparam command="load" file="$(find sara_arm)/config/sara_arm_parametres.yaml"/>
 
     <!--   Start phase0 hardware  -->
-    <node pkg="sara_arm" type="sara_arm" name="sara_arm_hardware_interface" output="screen"></node>
+    <node pkg="sara_arm" type="sara_arm" name="sara_arm" output="screen">
+        <remap from="/sara_arm_controller/cmd_vel" to="/cmd_vel" />
+    </node>
+
+
 
     <!--   Start Controller spawner  -->
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="sara_arm_velocity_controller --shutdown-timeout 3"/>
+    <node name="sara_arm_controller_spawner" pkg="controller_manager" type="spawner"
+        respawn="false"
+        output="screen" args="sara_arm_controller"/>
 
 
 </launch>
