@@ -2,33 +2,14 @@
 
 #include <hardware_interface/joint_command_interface.h>
 #include <controller_manager/controller_manager.h>
-#include <hardware_interface/joint_state_interface.h>
-#include <hardware_interface/robot_hw.h>
 #include <Kinova.API.CommLayerUbuntu.h>
 #include <KinovaTypes.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <cmath>
 #include <dlfcn.h>
-#include <stdio.h>
-
 #include "Lib/sara_arm_hardware_interface.h"
-#include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Int8MultiArray.h"
 #include "std_msgs/Int8.h"
 #include "std_msgs/Bool.h"
-
-#include <vector>
-#include <stdio.h>
-
-
-
-
-
 
 
 
@@ -37,21 +18,32 @@
 
 MyRobot::MyRobot() {
     // connect and register the joint state interface
-    ROS_INFO("--1--");
     int i = 0;
     std::string Name;
-    Name = "Motor"+boost::lexical_cast<std::string>(i+1);
+    ROS_INFO("\"< < <      E N R E G I S T R E M E N T   D E S   J O I N T S     > > >\"");
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
     joint_state_interface_.registerHandle(hardware_interface::JointStateHandle( Name, &pos[i], &vel[i], &eff[i++]));
-    ROS_INFO("--2--");
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_state_interface_.registerHandle(hardware_interface::JointStateHandle( Name, &pos[i], &vel[i], &eff[i++]));
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_state_interface_.registerHandle(hardware_interface::JointStateHandle( Name, &pos[i], &vel[i], &eff[i++]));
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_state_interface_.registerHandle(hardware_interface::JointStateHandle( Name, &pos[i], &vel[i], &eff[i++]));
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_state_interface_.registerHandle(hardware_interface::JointStateHandle( Name, &pos[i], &vel[i], &eff[i++]));
     registerInterface(&joint_state_interface_);
-    ROS_INFO("--3--");
     i = 0;
     // connect and register the joint velocity interface
-    Name = "Motor"+boost::lexical_cast<std::string>(i+1);
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
     joint_velocity_interface_.registerHandle(hardware_interface::JointHandle(joint_state_interface_.getHandle(Name), &cmd[i++]));
-
-    ROS_INFO("--4--");
-
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_velocity_interface_.registerHandle(hardware_interface::JointHandle(joint_state_interface_.getHandle(Name), &cmd[i++]));
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_velocity_interface_.registerHandle(hardware_interface::JointHandle(joint_state_interface_.getHandle(Name), &cmd[i++]));
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_velocity_interface_.registerHandle(hardware_interface::JointHandle(joint_state_interface_.getHandle(Name), &cmd[i++]));
+    Name = "sara_arm_joint_"+boost::lexical_cast<std::string>(i+1);
+    joint_velocity_interface_.registerHandle(hardware_interface::JointHandle(joint_state_interface_.getHandle(Name), &cmd[i++]));
     registerInterface(&joint_velocity_interface_);
 
 }
@@ -60,29 +52,29 @@ MyRobot::MyRobot() {
 
 void MyRobot::Read() {
 
-    //ROS_INFO("--1--");
+
     /*
     float PositionList[NOMBRE_DE_MOTEURS_KINOVA];
     float VelocityList[NOMBRE_DE_MOTEURS_KINOVA];
     MyGetActuatorsPosition(PositionList);
     MyGetActuatorsPosition(VelocityList);
-    */
-   // ROS_INFO("--2--");
+
     for (int i=0; i < NOMBRE_DE_MOTEURS_KINOVA; i++) {
         // << ----  U P D A T E   S T A T U S  ---- >>
-/*
-        ROS_INFO("--2--");
+
 
         pos[i] = PositionList[i];
         vel[i] = VelocityList[i];
         // eff[i] = 0.0F;
-*/
+
     }
+    */
 }
 
 
 
 void MyRobot::Write() {
+    //ROS_INFO("%d",cmd[0]);
     TrajectoryPoint pointToSend;
     //  << ---- E X E C U T E   O R D E R S ---- >>
     /*
@@ -93,19 +85,8 @@ void MyRobot::Write() {
     pointToSend.Limitations.speedParameter3 = 100;
     pointToSend.Position.Type = ANGULAR_VELOCITY;
     MySendAdvanceTrajectory(pointToSend);
-     */
+    */
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -113,10 +94,11 @@ void MyRobot::Write() {
 
 int main(int argc, char **argv) {
 
-    ROS_INFO("--e--");
     bool Succes = false;
     while (!Succes) {
         // We load the library
+
+        ROS_INFO("\"* * *            C H A R G E M E N T   D E   L A   B D           * * *\"");
         commandLayer_handle = dlopen("Kinova.API.USBCommandLayerUbuntu.so", RTLD_NOW|RTLD_GLOBAL);
 
         // We load the functions from the library
@@ -140,8 +122,9 @@ int main(int argc, char **argv) {
         // << ----   I N I T I A L I S A T I O N   ---- >>
         if ((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MySendBasicTrajectory == NULL) ||
             (MySendAdvanceTrajectory == NULL) || (MyMoveHome == NULL) || (MyInitFingers == NULL)) {
-                  //cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
-            //     cout << "* * *          T R Y I N G   A G A I N   I N   A  S E C      * * *" << endl;
+
+            ROS_INFO("\"* * *        P R O B L E M E   D E   C H A R G E M E N  T        * * *\"");
+            ROS_INFO("\"* * *             N O U V E L L E   T E N T A T I V E            * * *\"");
             sleep(1);
         } else {
             Succes = true;
@@ -150,58 +133,53 @@ int main(int argc, char **argv) {
 
 
     Succes = false;
-    int nb_attemps = 1;
+    int nb_attempts = 1;
     while (!Succes) {
 
-        ROS_INFO("--d--");
+        ROS_INFO("\"* * *              R E C H E R C H E   D U   B R A S             * * *\"");
         result = (*MyInitAPI)();
         devicesCount = MyGetDevices(devices, result);
         if (result != 1) {
-            //       cout << "* * *                  N O   A R M   F O U N D               * * *" << endl;
-            //       cout << "* * *                   A T T E M P   N B   " << nb_attemps << "              * * *" << endl;
-            //      cout << "* * *              S E A R C H I N G   A G A I N . . .       * * *" << endl;
-            nb_attemps++;
+
+            ROS_INFO("\"* * *      I N I T I A L I S A T I O N   T E R M I N E E         * * *\"");
+            ROS_INFO("\"* * *           B R A S   I N T R O U V V A B L E                * * *\"");
+            ROS_INFO("\"* * *           N O U V E L L E   R E C H E R C H E              * * *\"");
+            nb_attempts++;
             sleep(1);
         } else {
             Succes = true;
-            //       cout << "* * *                    A R M   F O U N D                 * * *" << endl;
+            ROS_INFO("\"* * *      I N I T I A L I S A T I O N   T E R M I N E E         * * *\"");
+            ROS_INFO("\"* * *                  B R A S   T R O U V E E                   * * *\"");
         }
         Succes = true;
 
     }
-//    cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
-    //   cout << "Initialization's result :" << result << endl;
-//    cout << "Number of attemps :" << nb_attemps << endl;
 
     // ROS
     // Initialisation
+    ros::init(argc, argv, "sara_arm_controller");
 
-    ROS_INFO("--c--");
-    ros::init(argc, argv, "sara_arm");
-    ROS_INFO("--c1--");
-    // Obtention du nodehandle
+    ROS_INFO("\"* * *      spinner         * * *\"");
     ros::NodeHandle n;
-    ROS_INFO("--c2--");
-    // ros::spin();
-    ros::MultiThreadedSpinner spinner(4);  // Use 4 threads
-    ROS_INFO("--c3--");
+    //ros::MultiThreadedSpinner spinner(2);  // Use 2 threads
+    //spinner.spin();
+    ros::AsyncSpinner spinner(1);
+    spinner.start();
+
     ros::Duration period(0.02);
-    ROS_INFO("--c4--");
+
     // Création de l'instance de Sara
     MyRobot Sara;
-    ROS_INFO("--c5--");
-    ROS_INFO("--b--");
 
     controller_manager::ControllerManager cm(&Sara, n);
+
+
+    ROS_INFO("\"* * *      I N I T I A L I S A T I O N   T E R M I N E E         * * *\"");
     while (ros::ok())
     {
-      //  ROS_INFO("--a1--");
         Sara.Read();
-     //   ROS_INFO("--a2--");
         cm.update(ros::Time::now(), period);
-      //  ROS_INFO("--a3--");
         Sara.Write();
     }
-    spinner.spin();
 
 }
